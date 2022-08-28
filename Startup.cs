@@ -38,7 +38,10 @@ namespace my_books
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(ConnectionString));
 
             //Configure the Services
-            services.AddTransient < BooksService>() ;
+            services.AddTransient <BooksService>() ;
+            services.AddTransient<AuthorsService>();
+            services.AddTransient<PublishersService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "my_books", Version = "v1" });
@@ -71,7 +74,7 @@ namespace my_books
                 endpoints.MapControllers();
             });
 
-            AppDbInitialer.Seed(app);
+            //AppDbInitialer.Seed(app);
         }
     }
 }
