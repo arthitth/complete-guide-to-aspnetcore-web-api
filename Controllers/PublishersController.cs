@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using my_books.Data.Services;
 using my_books.Data.ViewModels;
+using my_books.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +20,38 @@ namespace my_books.Controllers
             _publishersService = publishersService;
         }
 
-        [HttpPost("add-publisher")]
-        public IActionResult AddBook([FromBody] PublisherVM publisher)
+        [HttpGet("get-all-publishers")]
+        public  IActionResult GetAllPublishers(string sortBy,string searchString,int pageNumber)
         {
-            var newPulisher = _publishersService.AddPublisher(publisher);
-            return Created(nameof(AddBook), newPulisher);
+            try
+            {
+                var _result = _publishersService.GetAllPublisers(sortBy, searchString, pageNumber);
+                return Ok(_result);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Sorry, we could not load the publishers");
+            }
+          
+        }
+
+        [HttpPost("add-publisher")]
+        public IActionResult AddPublisher([FromBody] PublisherVM publisher)
+        {
+            try
+            {
+                var newPulisher = _publishersService.AddPublisher(publisher);
+                return Created(nameof(AddPublisher), newPulisher);
+            }
+            catch (PublisherNameException ex)
+            {
+                return BadRequest($"{ex.Message},Publisher name: {ex.PublisherName}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        
         }
 
         [HttpGet("get-publisher-by-id/{id}")]
@@ -34,7 +62,8 @@ namespace my_books.Controllers
             if (_response != null)
             {
                 return Ok(_response);
-            }else
+            }
+            else
             {
                 return NotFound();
             }
@@ -50,8 +79,16 @@ namespace my_books.Controllers
         [HttpDelete("delete-publisher-by-id/{id}")]
         public IActionResult DeletePublisherById(int id)
         {
-            _publishersService.DeletePublisherById(id);
-            return Ok();
+            try
+            {
+                _publishersService.DeletePublisherById(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
     }
 }
