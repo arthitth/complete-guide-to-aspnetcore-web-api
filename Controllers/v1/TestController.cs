@@ -16,7 +16,7 @@ namespace my_books.Controllers.v1
     public class TestController : ControllerBase
     {
         [HttpGet("get-test-data")]
-        public IActionResult GetV1()
+        public IActionResult Get()
         {
             return Ok("This is version V1.0");
         }
